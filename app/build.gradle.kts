@@ -50,7 +50,8 @@ android {
 }
 
 dependencies {
-
+    // add ARCore library using the alias from version catalog
+    implementation(libs.arcore)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
