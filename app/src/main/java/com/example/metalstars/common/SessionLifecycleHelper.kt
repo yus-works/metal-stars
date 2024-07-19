@@ -1,9 +1,11 @@
 package com.example.metalstars.common
 
-import android.app.Activity
 import android.Manifest
-import androidx.core.content.ContextCompat
+import android.app.Activity
 import android.content.pm.PackageManager
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+
 
 var CAMERA_PERMISSION_CODE = 0;
 const val CAMERA_PERMISSION = Manifest.permission.CAMERA;
@@ -13,4 +15,14 @@ fun hasCameraPermission(activity: Activity): Boolean {
     val grantedPermission = PackageManager.PERMISSION_GRANTED
 
     return (cameraPermission == grantedPermission)
+}
+
+fun requestCameraPermission(activity: Activity?) {
+    if (activity != null) {
+        ActivityCompat.requestPermissions(
+            activity, arrayOf(CAMERA_PERMISSION), CAMERA_PERMISSION_CODE
+        )
+    } else {
+        println("Failed to request camera permission, activity is null")
+    }
 }
