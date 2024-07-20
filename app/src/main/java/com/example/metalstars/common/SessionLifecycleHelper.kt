@@ -59,19 +59,15 @@ fun tryCreateSession(activity: Activity, features: Set<Session.Feature> = setOf(
     }
 
     return try {
-        // Request installation if necessary.
         when (ArCoreApk.getInstance().requestInstall(activity, !installRequested)!!) {
             ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
                 installRequested = true
                 // tryCreateSession will be called again, so we return null for now.
                 return null
             }
-            ArCoreApk.InstallStatus.INSTALLED -> {
-                // Left empty; nothing needs to be done.
-            }
+            ArCoreApk.InstallStatus.INSTALLED -> {}
         }
 
-        // Create a session if Google Play Services for AR is installed and up to date.
         Session(activity, features)
     } catch (e: Exception) {
         exceptionCallback?.invoke(e)
@@ -100,15 +96,18 @@ fun onDestroy(session: Session?) {
 }
 
 fun onRequestPermissionsResult(activity: Activity) {
-    if (!hasCameraPermission(activity)) {
-        Toast.makeText(
-            activity,
-            "Camera permission is needed to run this application",
-            Toast.LENGTH_LONG
-        ).show()
-        if (!shouldShowRequestPermissionRationale(activity)) {
-            launchPermissionSettings(activity)
-        }
-        activity.finish()
+    if (hasCameraPermission(activity)) {
+        return
     }
+
+    Toast.makeText(
+        activity,
+        "Camera permission is needed to run this application",
+        Toast.LENGTH_LONG
+    ).show()
+
+    if (!shouldShowRequestPermissionRationale(activity)) {
+        launchPermissionSettings(activity)
+    }
+    activity.finish()
 }
