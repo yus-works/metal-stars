@@ -9,6 +9,7 @@ import android.content.Intent
 import android.provider.Settings
 import android.net.Uri
 import android.widget.Toast
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.google.ar.core.ArCoreApk
 import com.google.ar.core.Session
@@ -47,67 +48,74 @@ fun launchPermissionSettings(activity: Activity) {
     activity.startActivity(intent);
 }
 
-var installRequested = false
+class SessionLifecycleHelper(
+    val activity: Activity,
+    val features: Set<Session.Feature> = setOf()
+) : DefaultLifecycleObserver {
+    var installRequested = false
+    var session: Session? = null
+        private set
 
-var exceptionCallback: ((Exception) -> Unit)? = null
-var beforeSessionResume: ((Session) -> Unit)? = null
+    var exceptionCallback: ((Exception) -> Unit)? = null
+    var beforeSessionResume: ((Session) -> Unit)? = null
 
-fun tryCreateSession(activity: Activity, features: Set<Session.Feature> = setOf()): Session? {
-    if (!hasCameraPermission(activity)) {
-        requestCameraPermission(activity)
-        return null
-    }
-
-    return try {
-        when (ArCoreApk.getInstance().requestInstall(activity, !installRequested)!!) {
-            ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
-                installRequested = true
-                // tryCreateSession will be called again, so we return null for now.
-                return null
-            }
-            ArCoreApk.InstallStatus.INSTALLED -> {}
+    private fun tryCreateSession(): Session? {
+        if (!hasCameraPermission(activity)) {
+            requestCameraPermission(activity)
+            return null
         }
 
-        Session(activity, features)
-    } catch (e: Exception) {
-        exceptionCallback?.invoke(e)
-        null
-    }
-}
+        return try {
+            when (ArCoreApk.getInstance().requestInstall(activity, !installRequested)) {
+                ArCoreApk.InstallStatus.INSTALL_REQUESTED -> {
+                    installRequested = true
+                    // tryCreateSession will be called again, so we return null for now.
+                    return null
+                }
+                ArCoreApk.InstallStatus.INSTALLED -> {}
+            }
 
-fun onResume(activity: Activity, session: Session?): Session? {
-    val newSession = session ?: tryCreateSession(activity) ?: return null
-    return try {
-        beforeSessionResume?.invoke(newSession)
-        newSession.resume()
-        newSession
-    } catch (e: CameraNotAvailableException) {
-        exceptionCallback?.invoke(e)
-        null
-    }
-}
-
-fun onPause(session: Session?) {
-    session?.pause()
-}
-
-fun onDestroy(session: Session?) {
-    session?.close()
-}
-
-fun onRequestPermissionsResult(activity: Activity) {
-    if (hasCameraPermission(activity)) {
-        return
+            Session(activity, features)
+        } catch (e: Exception) {
+            exceptionCallback?.invoke(e)
+            null
+        }
     }
 
-    Toast.makeText(
-        activity,
-        "Camera permission is needed to run this application",
-        Toast.LENGTH_LONG
-    ).show()
-
-    if (!shouldShowRequestPermissionRationale(activity)) {
-        launchPermissionSettings(activity)
+    override fun onResume(owner: LifecycleOwner) {
+        val session = this.session ?: tryCreateSession() ?: return
+        try {
+            beforeSessionResume?.invoke(session)
+            session.resume()
+            this.session = session
+        } catch (e: CameraNotAvailableException) {
+            exceptionCallback?.invoke(e)
+        }
     }
-    activity.finish()
+
+    override fun onPause(owner: LifecycleOwner) {
+        session?.pause()
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        session?.close()
+        session = null
+    }
+
+    fun onRequestPermissionsResult() {
+        if (!hasCameraPermission(activity)) {
+            return
+        }
+
+        Toast.makeText(
+            activity,
+            "Camera permission is needed to run this application",
+            Toast.LENGTH_LONG
+        ).show()
+
+        if (!shouldShowRequestPermissionRationale(activity)) {
+            launchPermissionSettings(activity)
+        }
+        activity.finish()
+    }
 }
