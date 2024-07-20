@@ -10,6 +10,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import com.example.metalstars.R
+import com.google.android.material.snackbar.Snackbar;
 
 class ArView(val activity: MainActivity) : DefaultLifecycleObserver {
     val root = View.inflate(activity, R.layout.activity_main, null)
@@ -61,5 +62,22 @@ class ArView(val activity: MainActivity) : DefaultLifecycleObserver {
                 activity.configureSession(session)
             }
             .show()
+    }
+
+    // TODO: this probably needs to be adjusted
+    public fun showError(activity: MainActivity, errorMessage: String) {
+        var snackbar = Snackbar.make(
+            activity.findViewById(android.R.id.content),
+            errorMessage,
+            Snackbar.LENGTH_INDEFINITE
+        );
+
+        snackbar.setAction("Dismiss",  {
+            @Override
+            fun onClick(v: View) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
     }
 }
