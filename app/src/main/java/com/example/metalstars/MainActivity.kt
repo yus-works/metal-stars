@@ -163,9 +163,9 @@ class MainActivity : ComponentActivity() {
                         text = trackingFailureReason?.let {
                             it.getDescription(LocalContext.current)
                         } ?: if (childNodes.isEmpty()) {
-                            "gamers1"
+                            "Point your camera at a flat surface"
                         } else {
-                            "gamers2"
+                            "Tap on a surface to place the model"
                         }
                     )
                 }
