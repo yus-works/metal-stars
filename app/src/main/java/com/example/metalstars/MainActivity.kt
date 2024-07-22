@@ -150,6 +150,8 @@ class MainActivity : ComponentActivity() {
                         // camera current position and rotation as a pose
                         val cameraPose = camera.pose
 
+                        debug = poseDebugInfo(cameraPose)
+
                         val translation = floatArrayOf(-3f, 0f, 0f)
 
                         // rotate the translation vector to align with the camera's current orientation
@@ -166,8 +168,6 @@ class MainActivity : ComponentActivity() {
                         )
 
                         val anchor = currentSession?.createAnchor(anchorPose) ?: return@rememberOnGestureListener
-
-                        debug = poseDebugInfo(anchor.pose)
 
                         childNodes += createAnchorNode(
                             engine = engine,
