@@ -113,9 +113,7 @@ class MainActivity : ComponentActivity() {
                 sessionConfiguration = { session, config -> setSessionConfig(session, config) },
                 cameraNode = cameraNode,
                 planeRenderer = planeRenderer,
-                onTrackingFailureChanged = {
-                    trackingFailureReason = it
-                },
+                onTrackingFailureChanged = { trackingFailureReason = it },
                 onSessionUpdated = { session, updatedFrame ->
                     frame = updatedFrame
 
