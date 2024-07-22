@@ -182,7 +182,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier
                     .systemBarsPadding()
                     .fillMaxWidth()
-                    .align(Alignment.TopCenter)
+                    .align(Alignment.TopStart)
                     .padding(top = 16.dp, start = 32.dp, end = 32.dp),
                 textAlign = TextAlign.Left,
                 fontSize = 28.sp,
