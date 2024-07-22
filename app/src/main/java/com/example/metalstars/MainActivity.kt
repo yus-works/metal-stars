@@ -103,6 +103,8 @@ class MainActivity : ComponentActivity() {
                 mutableStateOf<TrackingFailureReason?>(null)
             }
             var frame by remember { mutableStateOf<Frame?>(null) }
+            var currentSession by remember { mutableStateOf<Session?>(null) }
+            var debug by remember { mutableStateOf<String>("") }
             ARScene(
                 modifier = Modifier.fillMaxSize(),
                 childNodes = childNodes,
@@ -110,7 +112,7 @@ class MainActivity : ComponentActivity() {
                 view = view,
                 modelLoader = modelLoader,
                 collisionSystem = collisionSystem,
-                sessionConfiguration = { session, config -> setSessionConfig(session, config) },
+                sessionConfiguration = { session, config -> currentSession = session; setSessionConfig(session, config) },
                 cameraNode = cameraNode,
                 planeRenderer = planeRenderer,
                 onTrackingFailureChanged = { trackingFailureReason = it },
