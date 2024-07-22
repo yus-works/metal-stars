@@ -203,7 +203,7 @@ class MainActivity : ComponentActivity() {
                 modifier = Modifier.align(Alignment.BottomStart)
             ) {
                 Button( onClick = { constantDebug = !constantDebug } ) {
-                    Text("")
+                    Text("constant debug info")
                 }
             }
         }
