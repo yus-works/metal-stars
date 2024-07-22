@@ -40,6 +40,7 @@ import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
+import com.google.ar.core.Pose
 import com.google.ar.core.Session
 import com.google.ar.core.TrackingFailureReason
 import io.github.sceneview.ar.ARScene
@@ -64,6 +65,7 @@ import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
 import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
+import java.util.Arrays
 
 
 private const val kModelFile = "models/simple_satellite_low_poly_free.glb"
@@ -202,6 +204,24 @@ class MainActivity : ComponentActivity() {
                 SurfaceContainer()
             }
         }
+    }
+
+    fun poseDebugInfo(pose: Pose): String {
+        var poseInfo = ""
+        val symbols = arrayOf("x", "y", "z", "w")
+        for ((i, e) in pose.translation.withIndex()) {
+            val el = if (e >= 0) { " $e" } else { "$e" }
+
+            poseInfo += "${symbols[i]}: $el\n"
+        }
+        poseInfo += "\n"
+        for ((i, e) in pose.rotationQuaternion.withIndex()) {
+            val el = if (e >= 0) { " $e" } else { "$e" }
+
+            poseInfo += "${symbols[i]}: $el\n"
+        }
+
+        return poseInfo
     }
 
     fun createAnchorNode(
