@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -108,6 +109,7 @@ class MainActivity : ComponentActivity() {
             }
             var frame by remember { mutableStateOf<Frame?>(null) }
             var currentSession by remember { mutableStateOf<Session?>(null) }
+            var constantDebug by remember { mutableStateOf<Boolean>(false) }
             var debug by remember { mutableStateOf<String>("") }
             ARScene(
                 modifier = Modifier.fillMaxSize(),
@@ -122,6 +124,10 @@ class MainActivity : ComponentActivity() {
                 onTrackingFailureChanged = { trackingFailureReason = it },
                 onSessionUpdated = { session, updatedFrame ->
                     frame = updatedFrame
+
+                    if (constantDebug) {
+                        debug = poseDebugInfo(frame!!.camera.pose)
+                    }
 
                     if (childNodes.isEmpty()) {
                         updatedFrame.getUpdatedPlanes()
@@ -193,6 +199,13 @@ class MainActivity : ComponentActivity() {
 //                    "Tap on a surface to place the model"
 //                }
             )
+            Box(
+                modifier = Modifier.align(Alignment.BottomStart)
+            ) {
+                Button( onClick = { constantDebug = !constantDebug } ) {
+                    Text("")
+                }
+            }
         }
     }
 
