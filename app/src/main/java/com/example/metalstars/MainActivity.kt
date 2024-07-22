@@ -135,25 +135,37 @@ class MainActivity : ComponentActivity() {
                 },
                 onGestureListener = rememberOnGestureListener(
                     onSingleTapConfirmed = { motionEvent, node ->
-                        if (node == null) {
-                            val hitResults = frame?.hitTest(motionEvent.x, motionEvent.y)
-                            hitResults?.firstOrNull {
-                                it.isValid(
-                                    depthPoint = false,
-                                    point = false
-                                )
-                            }?.createAnchorOrNull()
-                                ?.let { anchor ->
-                                    planeRenderer = false
-                                    childNodes += createAnchorNode(
-                                        engine = engine,
-                                        modelLoader = modelLoader,
-                                        materialLoader = materialLoader,
-                                        modelInstances = modelInstances,
-                                        anchor = anchor
-                                    )
-                                }
-                        }
+                        val camera = frame!!.camera
+
+                        // camera current position and rotation as a pose
+                        val cameraPose = camera.pose
+
+                        val translation = floatArrayOf(-3f, 0f, 0f)
+
+                        // rotate the translation vector to align with the camera's current orientation
+                        val rotatedTranslation = cameraPose.rotateVector(translation)
+
+                        // create a new pose for the anchor
+                        val anchorPose = Pose(
+                            floatArrayOf(
+                                cameraPose.tx() + rotatedTranslation[0],
+                                cameraPose.ty() + rotatedTranslation[1],
+                                cameraPose.tz() + rotatedTranslation[2]
+                            ),
+                            cameraPose.rotationQuaternion
+                        )
+
+                        val anchor = currentSession?.createAnchor(anchorPose) ?: return@rememberOnGestureListener
+
+                        debug = poseDebugInfo(anchor.pose)
+
+                        childNodes += createAnchorNode(
+                            engine = engine,
+                            modelLoader = modelLoader,
+                            materialLoader = materialLoader,
+                            modelInstances = modelInstances,
+                            anchor = anchor
+                        )
                     })
             )
             Text(
