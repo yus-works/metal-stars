@@ -28,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -174,16 +176,20 @@ class MainActivity : ComponentActivity() {
                     .fillMaxWidth()
                     .align(Alignment.TopCenter)
                     .padding(top = 16.dp, start = 32.dp, end = 32.dp),
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Left,
                 fontSize = 28.sp,
                 color = Color.White,
-                text = trackingFailureReason?.let {
-                    it.getDescription(LocalContext.current)
-                } ?: if (childNodes.isEmpty()) {
-                    "Point your camera at a flat surface"
-                } else {
-                    "Tap on a surface to place the model"
-                }
+                text = debug,
+                style = TextStyle(
+                    fontFamily = FontFamily.Monospace
+                )
+//                text = trackingFailureReason?.let {
+//                    it.getDescription(LocalContext.current)
+//                } ?: if (childNodes.isEmpty()) {
+//                    "Point your camera at a flat surface"
+//                } else {
+//                    "Tap on a surface to place the model"
+//                }
             )
         }
     }
