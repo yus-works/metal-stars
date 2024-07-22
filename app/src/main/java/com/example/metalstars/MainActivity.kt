@@ -38,6 +38,7 @@ import com.google.ar.core.Anchor
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
 import com.google.ar.core.Plane
+import com.google.ar.core.Session
 import com.google.ar.core.TrackingFailureReason
 import io.github.sceneview.ar.ARScene
 import io.github.sceneview.ar.arcore.createAnchorOrNull
@@ -67,6 +68,17 @@ private const val kModelFile = "models/simple_satellite_low_poly_free.glb"
 private const val kMaxModelInstances = 10
 
 class MainActivity : ComponentActivity() {
+
+    private fun setSessionConfig(session: Session, config: Config) {
+        config.depthMode =
+            when (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
+                true -> Config.DepthMode.AUTOMATIC
+                else -> Config.DepthMode.DISABLED
+            }
+        config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
+        config.lightEstimationMode =
+            Config.LightEstimationMode.ENVIRONMENTAL_HDR
+    }
 
     @Composable
     private fun SurfaceContainer() {
@@ -98,16 +110,7 @@ class MainActivity : ComponentActivity() {
                 view = view,
                 modelLoader = modelLoader,
                 collisionSystem = collisionSystem,
-                sessionConfiguration = { session, config ->
-                    config.depthMode =
-                        when (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
-                            true -> Config.DepthMode.AUTOMATIC
-                            else -> Config.DepthMode.DISABLED
-                        }
-                    config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
-                    config.lightEstimationMode =
-                        Config.LightEstimationMode.ENVIRONMENTAL_HDR
-                },
+                sessionConfiguration = { session, config -> setSessionConfig(session, config) },
                 cameraNode = cameraNode,
                 planeRenderer = planeRenderer,
                 onTrackingFailureChanged = {
