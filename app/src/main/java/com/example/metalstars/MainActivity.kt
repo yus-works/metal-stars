@@ -86,14 +86,9 @@ class MainActivity : ComponentActivity() {
     private lateinit var phoneOrientation: PhoneOrientation
 
     private fun setSessionConfig(session: Session, config: Config) {
-        config.depthMode =
-            when (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
-                true -> Config.DepthMode.AUTOMATIC
-                else -> Config.DepthMode.DISABLED
-            }
+        config.depthMode = Config.DepthMode.DISABLED
         config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
-        config.lightEstimationMode =
-            Config.LightEstimationMode.ENVIRONMENTAL_HDR
+        config.lightEstimationMode = Config.LightEstimationMode.DISABLED
     }
 
     private fun checkLocationPermission() {
@@ -130,7 +125,6 @@ class MainActivity : ComponentActivity() {
             val view = rememberView(engine)
             val collisionSystem = rememberCollisionSystem(view)
 
-            var planeRenderer by remember { mutableStateOf(true) }
 
             val modelInstances = remember { mutableListOf<ModelInstance>() }
             var trackingFailureReason by remember {
@@ -149,27 +143,12 @@ class MainActivity : ComponentActivity() {
                 collisionSystem = collisionSystem,
                 sessionConfiguration = { session, config -> currentSession = session; setSessionConfig(session, config) },
                 cameraNode = cameraNode,
-                planeRenderer = planeRenderer,
                 onTrackingFailureChanged = { trackingFailureReason = it },
                 onSessionUpdated = { session, updatedFrame ->
                     frame = updatedFrame
 
                     if (constantDebug) {
                         debug = poseDebugInfo(frame!!.camera.pose)
-                    }
-
-                    if (childNodes.isEmpty()) {
-                        updatedFrame.getUpdatedPlanes()
-                            .firstOrNull { it.type == Plane.Type.HORIZONTAL_UPWARD_FACING }
-                            ?.let { it.createAnchorOrNull(it.centerPose) }?.let { anchor ->
-                                childNodes += createAnchorNode(
-                                    engine = engine,
-                                    modelLoader = modelLoader,
-                                    materialLoader = materialLoader,
-                                    modelInstances = modelInstances,
-                                    anchor = anchor
-                                )
-                            }
                     }
                 },
                 onGestureListener = rememberOnGestureListener(
