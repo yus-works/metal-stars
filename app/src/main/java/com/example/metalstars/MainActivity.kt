@@ -109,6 +109,7 @@ class MainActivity : ComponentActivity() {
         if (location != null) {
             return arrayOf(location.latitude, location.longitude, location.altitude)
         }
+        return arrayOf()
     }
 
     @Composable
