@@ -83,6 +83,8 @@ private const val LOCATION_PERMISSION_REQUEST_CODE = 100
 
 class MainActivity : ComponentActivity() {
 
+    private lateinit var phoneOrientation: PhoneOrientation
+
     private fun setSessionConfig(session: Session, config: Config) {
         config.depthMode =
             when (session.isDepthModeSupported(Config.DepthMode.AUTOMATIC)) {
@@ -203,6 +205,9 @@ class MainActivity : ComponentActivity() {
                             modelInstances = modelInstances,
                             anchor = anchor
                         )
+
+                        debug = phoneOrientation.getQuaternion().contentToString()
+
                     })
             )
             Text(
@@ -245,6 +250,18 @@ class MainActivity : ComponentActivity() {
                 SurfaceContainer()
             }
         }
+
+        phoneOrientation = PhoneOrientation(this)
+    }
+
+    override fun onResume() {
+        super.onResume()
+        phoneOrientation.start()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        phoneOrientation.stop()
     }
 
     fun poseDebugInfo(pose: Pose): String {
