@@ -155,7 +155,57 @@ class MainActivity : ComponentActivity() {
                     frame = updatedFrame
 
                     if (constantDebug) {
-                        debug = poseDebugInfo(frame!!.camera.pose)
+                        // debug = poseDebugInfo(frame!!.camera.pose)
+
+                        val orientationQuaternion = phoneOrientation.getQuaternion()
+
+                        val x = orientationQuaternion[0]
+                        val y = orientationQuaternion[1]
+                        val z = orientationQuaternion[2]
+                        val w = orientationQuaternion[3]
+
+                        val theta = 2 * Math.acos(w.toDouble())
+
+                        val sinThetaOver2 = Math.sin(theta / 2)
+                        val ux = x / sinThetaOver2
+                        val uy = y / sinThetaOver2
+                        val uz = z / sinThetaOver2
+
+                        debug = "\nth: ${String.format("%.3f", Math.toDegrees(theta)).padStart(1)}\nx : ${String.format("%.3f", ux).padStart(1)}\ny : ${String.format("%.3f", uy).padStart(1)}\nz : ${String.format("%.3f", uz).padStart(1)}"
+
+
+                        var q2 = frame!!.camera.pose.rotationQuaternion
+
+
+                        val fx = q2[0]
+                        val fy = q2[1]
+                        val fz = q2[2]
+                        val fw = q2[3]
+
+                        val ttheta = 2 * Math.acos(fw.toDouble())
+
+                        val ssinThetaOver2 = Math.sin(ttheta / 2)
+                        val uux = fx / ssinThetaOver2
+                        val uuy = fy / ssinThetaOver2
+                        val uuz = fz / ssinThetaOver2
+
+                        debug += "\n\nth: ${String.format("%.3f", Math.toDegrees(ttheta)).padStart(1)}\nx : ${String.format("%.3f", uux).padStart(1)}\ny : ${String.format("%.3f", uuy).padStart(1)}\nz : ${String.format("%.3f", uuz).padStart(1)}"
+
+
+                        val forwardVector = Vector3(0f, 0f, -1f)
+
+                        var qq = Quaternion(
+                            q2[0],
+                            q2[1],
+                            q2[2],
+                            q2[3]
+                        )
+                        // NOTE: YOU DO NEED THE QUATERNION SANDWICH!!!
+                        val worldAlignedVector = Quaternion.inverseRotateVector(qq, Quaternion.rotateVector(qq, forwardVector))
+
+                        debug = "x : ${worldAlignedVector.x}\n" +
+                                "y : ${worldAlignedVector.y}\n" +
+                                "z : ${worldAlignedVector.z}\n"
                     }
                 },
                 onGestureListener = rememberOnGestureListener(
