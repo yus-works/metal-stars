@@ -60,9 +60,10 @@ class PhoneOrientation(context: Context) {
         val orientationMatrix = FloatArray(3)
         SensorManager.getOrientation(rotationMatrix, orientationMatrix)
 
-        val c1 = cos(orientationMatrix[0] / 2)
-        val c2 = cos(orientationMatrix[1] / 2)
-        val c3 = cos(orientationMatrix[2] / 2)
+        // Calculating quaternion components
+        val c1 = cos(orientationMatrix[0] / 2)  // yaw (azimuth)
+        val c2 = cos(orientationMatrix[1] / 2)  // pitch
+        val c3 = cos(orientationMatrix[2] / 2)  // roll
         val s1 = sin(orientationMatrix[0] / 2)
         val s2 = sin(orientationMatrix[1] / 2)
         val s3 = sin(orientationMatrix[2] / 2)
