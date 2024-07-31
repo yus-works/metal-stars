@@ -209,13 +209,6 @@ class MainActivity : ComponentActivity() {
                 style = TextStyle(
                     fontFamily = FontFamily.Monospace
                 )
-//                text = trackingFailureReason?.let {
-//                    it.getDescription(LocalContext.current)
-//                } ?: if (childNodes.isEmpty()) {
-//                    "Point your camera at a flat surface"
-//                } else {
-//                    "Tap on a surface to place the model"
-//                }
             )
             Box(
                 modifier = Modifier.align(Alignment.BottomStart)
