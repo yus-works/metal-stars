@@ -200,12 +200,17 @@ class MainActivity : ComponentActivity() {
                             q2[2],
                             q2[3]
                         )
-                        // NOTE: YOU DO NEED THE QUATERNION SANDWICH!!!
-                        val worldAlignedVector = Quaternion.inverseRotateVector(qq, Quaternion.rotateVector(qq, forwardVector))
+                        val worldAlignedVector = Quaternion.rotateVector(qq, forwardVector)
+
+                        val cameraPose = frame!!.camera.pose
 
                         debug = "x : ${worldAlignedVector.x}\n" +
                                 "y : ${worldAlignedVector.y}\n" +
                                 "z : ${worldAlignedVector.z}\n"
+
+                        debug += "\n\nx : ${cameraPose.tx()}\n" +
+                                "y : ${cameraPose.ty()}\n" +
+                                "z : ${cameraPose.tz()}\n"
                     }
                 },
                 onGestureListener = rememberOnGestureListener(
