@@ -139,7 +139,16 @@ class MainActivity : ComponentActivity() {
                 view = view,
                 modelLoader = modelLoader,
                 collisionSystem = collisionSystem,
-                sessionConfiguration = { session, config -> currentSession = session; setSessionConfig(session, config) },
+                sessionConfiguration = { session, config ->
+                    currentSession = session
+                    config.depthMode = Config.DepthMode.DISABLED
+                    config.setDepthMode(Config.DepthMode.DISABLED)
+                    config.setInstantPlacementMode(Config.InstantPlacementMode.DISABLED)
+                    config.instantPlacementMode = Config.InstantPlacementMode.DISABLED
+                    config.lightEstimationMode = Config.LightEstimationMode.DISABLED
+                    config.planeFindingMode = Config.PlaneFindingMode.DISABLED
+                    config.setPlaneFindingMode(Config.PlaneFindingMode.DISABLED)
+                },
                 cameraNode = cameraNode,
                 onTrackingFailureChanged = { trackingFailureReason = it },
                 onSessionUpdated = { session, updatedFrame ->
