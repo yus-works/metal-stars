@@ -68,9 +68,9 @@ class PhoneOrientation(context: Context) {
         val s2 = sin(orientationMatrix[1] / 2)
         val s3 = sin(orientationMatrix[2] / 2)
 
-        quaternion[0] = c1 * c2 * c3 + s1 * s2 * s3 // w
-        quaternion[1] = s1 * c2 * c3 - c1 * s2 * s3 // x
-        quaternion[2] = c1 * s2 * c3 + s1 * c2 * s3 // y
-        quaternion[3] = c1 * c2 * s3 - s1 * s2 * c3 // z
+        quaternion[0] = s1 * s2 * c3 + c1 * c2 * s3 // x
+        quaternion[1] = s1 * c2 * c3 + c1 * s2 * s3 // y
+        quaternion[2] = c1 * s2 * c3 - s1 * c2 * s3 // z
+        quaternion[3] = c1 * c2 * c3 - s1 * s2 * s3 // w
     }
 }
