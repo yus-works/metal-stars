@@ -207,7 +207,7 @@ class MainActivity : ComponentActivity() {
                         // camera current position and rotation as a pose
                         val cameraPose = camera.pose
 
-                        debug = poseDebugInfo(cameraPose)
+                        // TODO: figure out if you can set the world space to point north
 
                         val translation = floatArrayOf(-3f, 0f, 0f)
 
