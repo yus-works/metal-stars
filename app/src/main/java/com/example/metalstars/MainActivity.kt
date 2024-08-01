@@ -66,10 +66,15 @@ class MainActivity : ComponentActivity() {
 
     private lateinit var phoneOrientation: PhoneOrientation
 
-    private fun setSessionConfig(session: Session, config: Config) {
+    private fun setSessionConfig(config: Config) {
         config.depthMode = Config.DepthMode.DISABLED
-        config.instantPlacementMode = Config.InstantPlacementMode.LOCAL_Y_UP
+        config.instantPlacementMode = Config.InstantPlacementMode.DISABLED
         config.lightEstimationMode = Config.LightEstimationMode.DISABLED
+        config.planeFindingMode = Config.PlaneFindingMode.DISABLED
+
+        // disable environmental understanding whatever that is
+        config.focusMode = Config.FocusMode.FIXED
+        config.augmentedFaceMode = Config.AugmentedFaceMode.DISABLED
     }
 
     private fun checkLocationPermission() {
@@ -122,13 +127,7 @@ class MainActivity : ComponentActivity() {
                 collisionSystem = collisionSystem,
                 sessionConfiguration = { session, config ->
                     currentSession = session
-                    config.depthMode = Config.DepthMode.DISABLED
-                    config.setDepthMode(Config.DepthMode.DISABLED)
-                    config.setInstantPlacementMode(Config.InstantPlacementMode.DISABLED)
-                    config.instantPlacementMode = Config.InstantPlacementMode.DISABLED
-                    config.lightEstimationMode = Config.LightEstimationMode.DISABLED
-                    config.planeFindingMode = Config.PlaneFindingMode.DISABLED
-                    config.setPlaneFindingMode(Config.PlaneFindingMode.DISABLED)
+                    setSessionConfig(config)
                 },
                 cameraNode = cameraNode,
                 onTrackingFailureChanged = { trackingFailureReason = it },
