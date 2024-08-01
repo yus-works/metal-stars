@@ -5,11 +5,12 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
+import androidx.core.content.getSystemService
 import kotlin.math.cos
 import kotlin.math.sin
 
 class PhoneOrientation(context: Context) {
-    private val sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
+    private val sensorManager: SensorManager = context.getSystemService()!!
     private val accelerometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
     private val magnetometer: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
@@ -23,12 +24,8 @@ class PhoneOrientation(context: Context) {
 
         override fun onSensorChanged(event: SensorEvent) {
             when (event.sensor.type) {
-                Sensor.TYPE_ACCELEROMETER -> {
-                    System.arraycopy(event.values, 0, gravity, 0, gravity.size)
-                }
-                Sensor.TYPE_MAGNETIC_FIELD -> {
-                    System.arraycopy(event.values, 0, geomagnetic, 0, geomagnetic.size)
-                }
+                Sensor.TYPE_ACCELEROMETER -> gravity.copyFrom(event.values)
+                Sensor.TYPE_MAGNETIC_FIELD -> geomagnetic.copyFrom(event.values)
             }
 
             if (SensorManager.getRotationMatrix(rotationMatrix, null, gravity, geomagnetic)) {
@@ -38,39 +35,34 @@ class PhoneOrientation(context: Context) {
     }
 
     fun start() {
-        accelerometer?.let {
-            sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_UI)
-        }
-        magnetometer?.let {
-            sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_UI)
-        }
+        registerSensor(accelerometer)
+        registerSensor(magnetometer)
     }
 
     fun stop() {
-        sensorManager.unregisterListener(sensorListener, accelerometer)
-        sensorManager.unregisterListener(sensorListener, magnetometer)
+        sensorManager.unregisterListener(sensorListener)
     }
 
-    // rotation quaternion relative to magnetic north
-    fun getQuaternion(): FloatArray {
-        return quaternion
+    fun getQuaternion(): FloatArray = quaternion.clone()
+
+    private fun registerSensor(sensor: Sensor?) {
+        sensor?.let { sensorManager.registerListener(sensorListener, it, SensorManager.SENSOR_DELAY_UI) }
     }
 
     private fun updateQuaternion() {
         val orientationMatrix = FloatArray(3)
         SensorManager.getOrientation(rotationMatrix, orientationMatrix)
 
-        // Calculating quaternion components
-        val c1 = cos(orientationMatrix[0] / 2)  // yaw (azimuth)
-        val c2 = cos(orientationMatrix[1] / 2)  // pitch
-        val c3 = cos(orientationMatrix[2] / 2)  // roll
-        val s1 = sin(orientationMatrix[0] / 2)
-        val s2 = sin(orientationMatrix[1] / 2)
-        val s3 = sin(orientationMatrix[2] / 2)
+        val (c1, c2, c3) = orientationMatrix.map { cos(it / 2) }
+        val (s1, s2, s3) = orientationMatrix.map { sin(it / 2) }
 
         quaternion[0] = s1 * s2 * c3 + c1 * c2 * s3 // x
         quaternion[1] = s1 * c2 * c3 + c1 * s2 * s3 // y
         quaternion[2] = c1 * s2 * c3 - s1 * c2 * s3 // z
         quaternion[3] = c1 * c2 * c3 - s1 * s2 * s3 // w
+    }
+
+    private fun FloatArray.copyFrom(source: FloatArray) {
+        System.arraycopy(source, 0, this, 0, this.size)
     }
 }
