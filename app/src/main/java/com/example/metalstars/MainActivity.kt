@@ -204,27 +204,40 @@ class MainActivity : ComponentActivity() {
                     onSingleTapConfirmed = { motionEvent, node ->
                         val camera = frame!!.camera
 
-                        // camera current position and rotation as a pose
                         val cameraPose = camera.pose
 
                         // TODO: figure out if you can set the world space to point north
 
-                        val translation = floatArrayOf(-3f, 0f, 0f)
+                        val v = Vector3(0f, 0f, -1f)
 
-                        // rotate the translation vector to align with the camera's current orientation
-                        val rotatedTranslation = cameraPose.rotateVector(translation)
+                        // NOTE: this quaternion should be rotation relative to magnetic north
+                        val oQ = phoneOrientation.getQuaternion()
 
-                        // create a new pose for the anchor
-                        val anchorPose = Pose(
-                            floatArrayOf(
-                                cameraPose.tx() + rotatedTranslation[0],
-                                cameraPose.ty() + rotatedTranslation[1],
-                                cameraPose.tz() + rotatedTranslation[2]
-                            ),
-                            cameraPose.rotationQuaternion
+                        val mQ = Quaternion(
+                            oQ[0],
+                            oQ[1],
+                            oQ[2],
+                            oQ[3],
                         )
 
-                        val anchor = currentSession?.createAnchor(anchorPose) ?: return@rememberOnGestureListener
+                        val nV = Quaternion.rotateVector(mQ, v)
+
+                        val modelPosition = Vector3(
+                            cameraPose.tx() + nV.x,
+                            cameraPose.ty() + nV.y,
+                            cameraPose.tz() + nV.z
+                        )
+
+                        val translatedPose = Pose(
+                            floatArrayOf(
+                                modelPosition.x,
+                                modelPosition.y,
+                                modelPosition.z,
+                            ),
+                            floatArrayOf( 0f, 0f, 0f, 1f )
+                        )
+
+                        val anchor = currentSession?.createAnchor(translatedPose) ?: return@rememberOnGestureListener
 
                         childNodes += createAnchorNode(
                             engine = engine,
@@ -233,9 +246,6 @@ class MainActivity : ComponentActivity() {
                             modelInstances = modelInstances,
                             anchor = anchor
                         )
-
-                        debug = phoneOrientation.getQuaternion().contentToString()
-
                     })
             )
             Text(
