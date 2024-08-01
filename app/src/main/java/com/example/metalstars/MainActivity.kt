@@ -191,13 +191,15 @@ class MainActivity : ComponentActivity() {
 
                         debug += "\n\nth: ${String.format("%.3f", Math.toDegrees(ttheta)).padStart(1)}\nx : ${String.format("%.3f", uux).padStart(1)}\ny : ${String.format("%.3f", uuy).padStart(1)}\nz : ${String.format("%.3f", uuz).padStart(1)}"
 
-                        // NOTE: for some reason, rotating by the phones quaternion turns the
-                        // y up x right z backward to z up y right x backward...
-                        // x -> z
-                        // y -> x
-                        // z -> y
-                        // so to make a forward vector you use x
-                        val forwardVector = Vector3(-1f, 0f, 0f)
+                        // NOTE: I figured it out.
+                        // The confusing permutation is actually arcore mapping the cameras local
+                        // space to world space, so if the phone is on a table with the camera
+                        // facing down, phone relative (0, 0, -1) becomes world relative (0, -1, 0)
+                        // because the phone's -Z points toward the worlds -Y, same thing happens
+                        // when you hold it up against a wall but since world Z is the same as
+                        // phone Z it stays the same.
+                        // P.S. the camera has to be exposed for any of this to work
+                        val forwardVector = Vector3(0f, 0f, -1f)
 
                         var qq = Quaternion(
                             q2[0],
