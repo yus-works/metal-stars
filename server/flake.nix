@@ -25,12 +25,18 @@
         };
 
         devShell = pkgs.mkShell {
+          # env vars or shell hooks here
           buildInputs = [
             pkgs.gleam
             pkgs.erlang
             pkgs.elixir
           ];
-          # env vars or shell hooks here
+          shellHook = ''
+            alias gs='git status'
+            alias gc='git commit'
+            alias gp='git push'
+            alias ga='git add'
+          '';
         };
       }
     );
