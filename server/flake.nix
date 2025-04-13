@@ -13,17 +13,6 @@
           inherit system;
         };
       in {
-        packages.default = pkgs.stdenv.mkDerivation {
-          pname = "gleam-project";
-          version = "0.1.0";
-          src = ./.;
-          buildInputs = [ pkgs.gleam ];
-          buildPhase = ''
-            echo "Building Gleam project..."
-            gleam build
-          '';
-        };
-
         devShell = pkgs.mkShell {
           # env vars or shell hooks here
           buildInputs = [
