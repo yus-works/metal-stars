@@ -17,6 +17,8 @@
           # env vars or shell hooks here
           buildInputs = [
             pkgs.gleam
+            pkgs.erlang
+            pkgs.elixir
           ];
           shellHook = ''
             alias gs='git status'
