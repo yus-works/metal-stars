@@ -16,6 +16,7 @@
         devShell = pkgs.mkShell {
           # env vars or shell hooks here
           buildInputs = [
+            pkgs.beamMinimal27Packages.rebar3
             pkgs.gleam
             pkgs.erlang
             pkgs.elixir
